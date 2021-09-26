@@ -162,7 +162,7 @@ var
 vmlinuz
 vmlinuz.old
 
-no priviledge escalation is required since we're already root
+no privilege escalation is required since we're already root
 
 find / -type f -iname "root.txt" 2\>/dev/null
 /root/root.txt
