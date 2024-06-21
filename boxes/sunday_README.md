@@ -90,7 +90,21 @@ Results:
 
 SSH into machine:
 ```
-ssh -oKexAlgorithms=diffie-hellman-group1-sha1 -p 22022 sunny@10.10.10.76
+ssh -oKexAlgorithms=diffie-hellman-group-exchange-sha256 -p 22022 sunny@10.10.10.76
 ```
 
+
+```
+john --wordlist=/usr/share/wordlists/rockyou.txt sammy-hash.txt
+Using default input encoding: UTF-8
+Loaded 1 password hash (sha256crypt, crypt(3) $5$ [SHA256 256/256 AVX2 8x])
+Cost 1 (iteration count) is 5000 for all loaded hashes
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+0g 0:00:00:18 0.95% (ETA: 15:13:37) 0g/s 8743p/s 8743c/s 8743C/s greena..biodome
+cooldude!        (sammy)
+1g 0:00:00:24 DONE (2024-06-21 14:42) 0.04003g/s 8198p/s 8198c/s 8198C/s domonique1..bluenote
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed.
+```
 
